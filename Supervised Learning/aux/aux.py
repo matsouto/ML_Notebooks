@@ -2,14 +2,14 @@ import math as m
 import numpy as np
 import copy as cp
 
-# from sklearn.linear_model import SGDRegressor
-# from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import SGDRegressor
+from sklearn.preprocessing import StandardScaler
 
 
-def zscore_normalization(x_train, y_train):
+def zscore_normalization(x_train):
     x_train_copy = cp.deepcopy(x_train)
-    y_train_copy = cp.deepcopy(y_train)
-    y_train_norm = np.zeros(y_train.shape[0])
+    # y_train_copy = cp.deepcopy(y_train)
+    # y_train_norm = np.zeros(y_train.shape[0])
     x_train_norm = np.zeros([x_train.shape[0], x_train.shape[1]])
 
     # Normalization per feature
@@ -17,18 +17,70 @@ def zscore_normalization(x_train, y_train):
         for j in range(x_train.shape[0]): # Each line
             x_train_norm[j][i] = (x_train_copy[j][i] - x_train_copy[:,i].mean()) / x_train_copy[:,i].std()
 
-    for i in range(y_train.shape[0]):
-        y_train_norm[i] = (y_train_copy[i] - y_train_copy.mean()) / y_train_copy.std()
+    # for i in range(y_train.shape[0]):
+    #     y_train_norm[i] = (y_train_copy[i] - y_train_copy.mean()) / y_train_copy.std()
 
     # scaler = StandardScaler()
     # y_train_norm = scaler.fit_transform(y_train.reshape(-1, 1))
 
-    return x_train_norm, y_train_norm
+    return x_train_norm
 
+def linear_compute_cost(x_train, y_train, w, b, lambda_ = 0):
+    f_wb = np.dot(x_train,w) + b 
+    loss = (f_wb - y_train) ** 2
+    J_wb = (sum(loss) + lambda_ * sum(w**2)) / (2*x_train.shape[0])
+
+    return J_wb
+
+def linear_compute_gradient(x_train, y_train, w, b):
+    f_wb = np.dot(x_train, w) + b 
+    dJdb = sum(f_wb - y_train) / x_train.shape[0]  
+    dJdw = np.dot((f_wb - y_train), x_train) / x_train.shape[0] 
+
+    return dJdb, dJdw
+
+def gradient_descent(x_train, y_train, initial_w, initial_b, gradient_function, cost_function, n_iters, alpha, lambda_ = 0, verbose = False):
+    w = cp.deepcopy(initial_w)
+    b = cp.deepcopy(initial_b)
+
+    J_history = []
+
+    for i in range(n_iters):
+        dJdb, dJdw = gradient_function(x_train, y_train, w, b)
+        dJdw += lambda_ / x_train.shape[0] * w # Add regularization 
+        w = w - alpha * dJdw
+        b = b - alpha * dJdb
+
+        cost = cost_function(x_train, y_train, w, b, lambda_)
+
+        if i<100000:      # prevent resource exhaustion 
+            J_history.append(cost)
+
+        if verbose and (i % m.ceil(n_iters/10) == 0):
+            print(f"Iteration {i}: Cost {float(J_history[-1]):8.2f}")
+    
+    return w, b, J_history
+
+def linear_prediction(x_test, w, b):
+    p = np.dot(x_test, w) + b
+
+    return p
+
+def sklearn_regression(x_train, y_train):
+    scaler = StandardScaler()
+    x_sk_norm = scaler.fit_transform(x_train)    
+
+    sgdr = SGDRegressor(max_iter=1000)
+    sgdr.fit(x_sk_norm, y_train)
+    b_sk_norm = sgdr.intercept_
+    w_sk_norm = sgdr.coef_
+
+    p_sk = np.dot(x_sk_norm, w_sk_norm) + b_sk_norm
+    
+    return w_sk_norm, b_sk_norm, p_sk
 
 def _test():
     return
-
 
 if __name__ == "__main__":
     _test()
