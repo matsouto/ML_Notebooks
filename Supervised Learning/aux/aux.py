@@ -12,10 +12,15 @@ def zscore_normalization(x_train):
     # y_train_norm = np.zeros(y_train.shape[0])
     x_train_norm = np.zeros([x_train.shape[0], x_train.shape[1]])
 
+    x_mean = []
+    x_std = []
+
     # Normalization per feature
     for i in range(x_train.shape[1]): # Each feature
+        x_mean.append(x_train_copy[:,i].mean())
+        x_std.append(x_train_copy[:,i].std())
         for j in range(x_train.shape[0]): # Each line
-            x_train_norm[j][i] = (x_train_copy[j][i] - x_train_copy[:,i].mean()) / x_train_copy[:,i].std()
+            x_train_norm[j][i] = (x_train_copy[j][i] - x_mean[i]) / x_std[i]
 
     # for i in range(y_train.shape[0]):
     #     y_train_norm[i] = (y_train_copy[i] - y_train_copy.mean()) / y_train_copy.std()
@@ -23,7 +28,7 @@ def zscore_normalization(x_train):
     # scaler = StandardScaler()
     # y_train_norm = scaler.fit_transform(y_train.reshape(-1, 1))
 
-    return x_train_norm
+    return x_train_norm, x_mean, x_std
 
 def linear_compute_cost(x_train, y_train, w, b, lambda_ = 0):
     f_wb = np.dot(x_train,w) + b 
@@ -61,7 +66,7 @@ def gradient_descent(x_train, y_train, initial_w, initial_b, gradient_function, 
     
     return w, b, J_history
 
-def linear_prediction(x_test, w, b):
+def linear_prediction_normalizedX(x_test, w, b):
     p = np.dot(x_test, w) + b
 
     return p
@@ -78,6 +83,15 @@ def sklearn_regression(x_train, y_train):
     p_sk = np.dot(x_sk_norm, w_sk_norm) + b_sk_norm
     
     return w_sk_norm, b_sk_norm, p_sk
+
+def predict_new_value(x_test, w, b, x_mean, x_std):
+    x_norm = np.zeros(len(x_test))
+    for i in range(len(x_test)):
+        x_norm[i] = (x_test[i] - x_mean[i]) / x_std[i] 
+
+    p = np.dot(x_norm, w) + b
+
+    return p
 
 def _test():
     return
