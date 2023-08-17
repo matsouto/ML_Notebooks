@@ -1,6 +1,7 @@
 import math as m
 import numpy as np
 import copy as cp
+import pandas as pd
 
 from sklearn.linear_model import SGDRegressor
 from sklearn.preprocessing import StandardScaler
@@ -8,6 +9,9 @@ from sklearn.preprocessing import StandardScaler
 
 def zscore_normalization(x_train):
     x_train_copy = cp.deepcopy(x_train)
+
+    if (type(x_train) == pd.core.frame.DataFrame): x_train_copy = x_train_copy.to_numpy()
+
     # y_train_copy = cp.deepcopy(y_train)
     # y_train_norm = np.zeros(y_train.shape[0])
     x_train_norm = np.zeros([x_train.shape[0], x_train.shape[1]])
@@ -37,10 +41,24 @@ def linear_compute_cost(x_train, y_train, w, b, lambda_ = 0):
 
     return J_wb
 
+def logistic_compute_cost(x_train, y_train, w, b, lambda_ = 0):
+    f_wb = sigmoid(np.dot(x_train, w) + b)
+    loss = - y_train * np.log(f_wb) - (1 - y_train) * np.log(1 - f_wb)
+    J_wb = sum(loss) / x_train.shape[0]
+    J_wb += (lambda_ / (2 * x_train.shape[0])) * sum(w**2)
+    return J_wb 
+
 def linear_compute_gradient(x_train, y_train, w, b):
     f_wb = np.dot(x_train, w) + b 
     dJdb = sum(f_wb - y_train) / x_train.shape[0]  
     dJdw = np.dot((f_wb - y_train), x_train) / x_train.shape[0] 
+
+    return dJdb, dJdw
+
+def logistic_compute_gradient(x_train, y_train, w, b):
+    f_wb = sigmoid(np.dot(x_train, w) + b) 
+    dJdb = sum(f_wb - y_train) / x_train.shape[0]  
+    dJdw = np.dot(f_wb - y_train, x_train) / x_train.shape[0]
 
     return dJdb, dJdw
 
@@ -92,6 +110,10 @@ def predict_new_value(x_test, w, b, x_mean, x_std):
     p = np.dot(x_norm, w) + b
 
     return p
+
+def sigmoid(z):
+    g = 1 / (1 + np.exp(-1 * z))
+    return g
 
 def _test():
     return
