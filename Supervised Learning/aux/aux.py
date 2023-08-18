@@ -46,6 +46,7 @@ def logistic_compute_cost(x_train, y_train, w, b, lambda_ = 0):
     loss = - y_train * np.log(f_wb) - (1 - y_train) * np.log(1 - f_wb)
     J_wb = sum(loss) / x_train.shape[0]
     J_wb += (lambda_ / (2 * x_train.shape[0])) * sum(w**2)
+
     return J_wb 
 
 def linear_compute_gradient(x_train, y_train, w, b):
@@ -70,7 +71,7 @@ def gradient_descent(x_train, y_train, initial_w, initial_b, gradient_function, 
 
     for i in range(n_iters):
         dJdb, dJdw = gradient_function(x_train, y_train, w, b)
-        dJdw += lambda_ / x_train.shape[0] * w # Add regularization 
+        dJdw += (lambda_ / x_train.shape[0]) * w # Add regularization 
         w = w - alpha * dJdw
         b = b - alpha * dJdb
 
