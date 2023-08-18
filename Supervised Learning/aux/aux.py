@@ -90,6 +90,17 @@ def linear_prediction_normalizedX(x_test, w, b):
 
     return p
 
+def logistic_prediction(x_test, w, b, target_names):
+    # Calculates for each w-set and than predicts the highest
+    p = [] 
+    for i in range(x_test.shape[0]):
+        temp_p = []
+        for j in range(len(w)):
+            temp_p.append(sigmoid(np.dot(x_test[i], w[j]) + b[j]))
+        p.append(target_names[temp_p.index(max(temp_p))])
+
+    return p
+
 def sklearn_regression(x_train, y_train):
     scaler = StandardScaler()
     x_sk_norm = scaler.fit_transform(x_train)    
