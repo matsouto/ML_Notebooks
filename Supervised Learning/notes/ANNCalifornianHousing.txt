@@ -1,0 +1,34 @@
+Loss: MSE
+
+Lambda = 0.01
+
+J_loss_min =  2359764736.0
+J_cv_min =  2839022336.0
+epochs_max = 100
+
+Lambda = 0.1
+
+J_loss_min =  2583641600.0
+J_cv_min =  2825192448.0
+epochs_max = 52
+
+Lambda = 0
+J_loss_min =  2785565184.0
+J_cv_min =  3151099904.0
+epochs_max = 42
+
+Lambda = 0.3
+J_loss_min =  2184481280.0
+J_cv_min =  2992661248.0
+
+Lambda = 0.5
+J_loss_min =  2041687936.0
+J_cv_min =  2839992832.0
+
+Lambda = 1
+J_loss_min =  2047498112.0
+J_cv_min =  2725525504.0
+
+Lambda = 0.5 and early stop
+J_loss_min =  2383370240.0
+J_cv_min =  2740959744.0
